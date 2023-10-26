@@ -36,7 +36,6 @@ dependencies:
   - fenics=2019.1.0
   - gmsh=4.11
   - meshio=5.3
-  - vtk=9.0
 
 # plotting stuff
   - matplotlib=3.7
@@ -49,8 +48,4 @@ dependencies:
     - meshio==5.3
 
   # tracking stuff
-    - dolfin_mech==2023.06.06
-    - dolfin_warp==2023.06.06
-
-variables:
-    CPATH: /srv/conda/envs/notebook/include/vtk-9.0
+    - dolfin_mech==2023.10.11

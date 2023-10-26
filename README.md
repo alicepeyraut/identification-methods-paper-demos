@@ -1,3 +1,3 @@
-# Welcome to [Genet, 2023, Comptes Rendus Mécanique (In Press)]'s demos!
+# Welcome to [Manoochehrtayebi, Bel-Brunon & Genet, In preparation]'s demos!
 
-Interactive demos can be found at https://mgenet.gitlabpages.inria.fr/N-DEG-paper-demos/index.html.
+Interactive demos can be found at https://mgenet.gitlabpages.inria.fr/micro-macro-paper-demos/index.html.
