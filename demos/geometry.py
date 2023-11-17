@@ -6,23 +6,19 @@
 ###                                                                          ###
 ################################################################################
 
-
 def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
+    import dolfin
+    import gmsh
     import math
     import meshio
-    import gmsh
     import os
     import pickle
-    import dolfin
-    import numpy as np
-    from scipy.spatial import Delaunay
     import matplotlib.pyplot as plt
-    from scipy.spatial import Voronoi, voronoi_plot_2d
+    import numpy
+    import scipy
 
-
-    ########## Initialization#######################################################
-
+    ########## Initialization ######################################################
 
     gmsh.initialize()
     gmsh.clear()
@@ -33,6 +29,7 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
     lcar = h/5
     l = 0
+
     ############# Funtions #########################################################
 
     def line_btw_points(P, Q):
@@ -79,7 +76,6 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
             y = (a1 * c2 - a2 * c1)/determinant
             return [x, y]
 
-
     def vertice_generator(P, Q, S):
         a1, b1, c1 = line_btw_points(P, Q)
         a2, b2, c2 = line_btw_points(Q, S)
@@ -102,12 +98,10 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
         return neighbors
 
-
     def one_points_intersection(neighbor_vertices, vertices, lines):
 
         lines.append([vertices[neighbor_vertices[0]][1]])
         return lines
-
 
     def two_points_intersection(neighbor_vertices, vertices, lines):
         mid_point = vertices[neighbor_vertices[0]][1]
@@ -154,9 +148,6 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
             point_up_2 = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
             c2_up = point_up_2[1] - m2 * point_up_2[0]
 
-
-
-
         mid_point_up = lines_Intersect(m1, c1_up, m2, c2_down)
         mid_point_down = lines_Intersect(m1, c1_down, m2, c2_up)
 
@@ -181,11 +172,10 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
         side_point_2_num = neighbor_vertices[2]
         side_point_3_num = neighbor_vertices[3]
 
-
-        m = np.zeros(3)
-        c = np.zeros(3)
-        c_up = np.zeros(3)
-        c_down = np.zeros(3)
+        m = numpy.zeros(3)
+        c = numpy.zeros(3)
+        c_up = numpy.zeros(3)
+        c_down = numpy.zeros(3)
         for i in range(len(side_points)):
             m[i], c[i] = line_2_points(mid_point, side_points[i])
             beta = math.atan(m[i])
@@ -204,8 +194,6 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
                 point_up = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
                 c_up[i] = point_up[1] - m[i] * point_up[0]
 
-
-
         gamma2 = getAngle(side_points[0], mid_point, side_points[1])
         gamma3 = getAngle(side_points[0], mid_point, side_points[2])
         # If clockwise:
@@ -220,40 +208,32 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
             mid_point_23 = lines_Intersect(m[1], c_down[1], m[2], c_up[2])
             mid_point_31 = lines_Intersect(m[2], c_down[2], m[0], c_up[0])
 
-
         lines.append([mid_point_num, [side_point_1_num , side_point_2_num, mid_point_12], [side_point_2_num, side_point_3_num, mid_point_23], [side_point_3_num, side_point_1_num, mid_point_31]])
         return lines
 
 #### ###########################################
-
-#  domain = 10
-
 
     file_name = "point_seeds"
     open_file = open(file_name, "rb")
     points = pickle.load(open_file)
     open_file.close()
 
-    if (seeds_remove is True): 
-        os.remove("point_seeds")  # Deleting the seeds file, created in seeds.py
+    if (seeds_remove is True):
+        os.remove("point_seeds") # Deleting the seeds file, created in seeds.py
 
-    vor = Voronoi(points)
-    # fig = voronoi_plot_2d(vor)
-    # plt.savefig('Voronoi.jpg')
+    vor = scipy.spatial.Voronoi(points)
     num = len(points)
 
-    period_neighbor_points_1 = np.zeros((num,2))
-    period_neighbor_points_2 = np.zeros((num,2))
-    period_neighbor_points_3 = np.zeros((num,2))
-    period_neighbor_points_4 = np.zeros((num,2))
-    period_neighbor_points_5 = np.zeros((num,2))
-    period_neighbor_points_6 = np.zeros((num,2))
-    period_neighbor_points_7 = np.zeros((num,2))
-    period_neighbor_points_8 = np.zeros((num,2))
+    period_neighbor_points_1 = numpy.zeros((num,2))
+    period_neighbor_points_2 = numpy.zeros((num,2))
+    period_neighbor_points_3 = numpy.zeros((num,2))
+    period_neighbor_points_4 = numpy.zeros((num,2))
+    period_neighbor_points_5 = numpy.zeros((num,2))
+    period_neighbor_points_6 = numpy.zeros((num,2))
+    period_neighbor_points_7 = numpy.zeros((num,2))
+    period_neighbor_points_8 = numpy.zeros((num,2))
 
-
-    domain_x = domain_y * np.sqrt(3)/1.5/2
-    
+    domain_x = domain_y * numpy.sqrt(3)/1.5/2
 
     for i in range(len(points)):
         period_neighbor_points_1[i][0] = points[i][0] - domain_x
@@ -279,16 +259,13 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
         period_neighbor_points_8[i][0] = points[i][0] + domain_x
         period_neighbor_points_8[i][1] = points[i][1] - domain_y
-
     
-    points = np.concatenate((points, period_neighbor_points_1, period_neighbor_points_2, period_neighbor_points_3, period_neighbor_points_4, period_neighbor_points_5, period_neighbor_points_6, period_neighbor_points_7, period_neighbor_points_8))
+    points = numpy.concatenate((points, period_neighbor_points_1, period_neighbor_points_2, period_neighbor_points_3, period_neighbor_points_4, period_neighbor_points_5, period_neighbor_points_6, period_neighbor_points_7, period_neighbor_points_8))
 
-    tri = Delaunay(points)
-
+    tri = scipy.spatial.Delaunay(points)
 
     plt.plot(points[:,0], points[:,1], 'o')
     plt.triplot(points[:,0], points[:,1], tri.simplices)
-
 
     # Put each triangle corners in one group
 
@@ -301,12 +278,10 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
     for i in range(number_of_triangels):
         vertices.append([triangles_cor[i], vertice_generator(points[triangles_cor[i, 0]], points[triangles_cor[i, 1]], points[triangles_cor[i, 2]])])
 
-
     # Find the neighbour triangles
     neighbor_triangles_by_number = []
     for i in range(number_of_triangels):
         neighbor_triangles_by_number.append(find_neighbour_triangles(i, triangles_cor[i], triangles_cor))
-
 
     # Put neighbour triangles vertices in one group which shows the ridge of Voronoi tessellation
 
@@ -319,12 +294,8 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
         if len(neighbor_triangles_by_number[i]) == 4:
             lines = three_points_intersection(neighbor_triangles_by_number[i], vertices, lines)
 
-
-
     surfaces = []
-
     for i in range(len(neighbor_triangles_by_number)):
-
         if len(neighbor_triangles_by_number[i]) == 4:
             point = vertices[i][1]
             for j in range(len(neighbor_triangles_by_number[i])-1):
@@ -356,13 +327,10 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
                     surfaces.append([i, neighbor_num, l])
 
-    # shift_y = 0
-    # shift_y = -0.2
-    # gmsh.initialize()
-    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, 0+shift_y, 0, lcar), occ.addPoint(domain_x, 0+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, 0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(0, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(0, domain_y+shift_y, 0, lcar), occ.addPoint(0, 0+shift_y, 0, lcar))])], 20000)
+    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0       ,        0+shift_y, 0, lcar), occ.addPoint(domain_x,        0+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x,        0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(       0, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(0       , domain_y+shift_y, 0, lcar), occ.addPoint(       0,        0+shift_y, 0, lcar))])], 20000)
 
     base = 'occ.fuse([(2,1)], [(2,2)'
     for i in range(l-2):
@@ -374,12 +342,10 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
     frame = occ.cut([(2, 20000)], [(2, 30000)])
 
-    
-
-    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, 0+shift_y, 0, lcar), occ.addPoint(domain_x, 0+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, 0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(0, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(0, domain_y+shift_y, 0, lcar), occ.addPoint(0, 0+shift_y, 0, lcar))])], 20001)
+    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(       0,        0+shift_y, 0, lcar), occ.addPoint(domain_x,        0+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x,        0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(       0, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(       0, domain_y+shift_y, 0, lcar), occ.addPoint(       0,        0+shift_y, 0, lcar))])], 20001)
 
     base = 'occ.cut([(2, 20001)], [(2, 1)'
     for i in range(len(frame[0])-1):
@@ -388,26 +354,13 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
     command = base + '], 40000)'
     exec(command)
     gmsh.option.setNumber("Mesh.MeshSizeMax", lcar)
-
     
     occ.synchronize()
     mat = gmsh.model.addPhysicalGroup(2, [40000])
-    # gmsh.model.addPhysicalGroup(2, [40000])
-    # gmsh.model.addPhysicalGroup(1, [124], 1)
-    # gmsh.model.addPhysicalGroup(1, [169, 176], 2)
-    # gmsh.model.addPhysicalGroup(1, [122], 3)
-    # gmsh.model.addPhysicalGroup(1, [123], 4)
-    # gmsh.model.addPhysicalGroup(1, [155], 5)
-    # gmsh.model.addPhysicalGroup(1, [168], 6)
-    # gmsh.model.addPhysicalGroup(1, [161, 162], 7)
-    # gmsh.model.addPhysicalGroup(1, [164, 165, 166], 8)
-    # gmsh.model.addPhysicalGroup(1, [157, 158, 159], 9)
-    # gmsh.model.addPhysicalGroup(1, [170, 171, 172, 173, 174, 175], 10)
-    # gmsh.model.geo.rotate(gmsh.model.occ.getEntities(40000), 0, 0, 0, 0, 1, 1, math.pi / 4)
     
-    zmin = 0; zmax = 0
+    zmin = 0        ; zmax = 0
     ymin = 0+shift_y; ymax = domain_y+shift_y
-    xmin = 0; xmax = domain_x
+    xmin = 0        ; xmax = domain_x
     e = 1e-6
     
     def setPeriodic(coord):
@@ -441,7 +394,6 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
     setPeriodic(0)
     setPeriodic(1)
-    # gmsh.fltk.run()
 
     gmsh.model.mesh.generate()
 
@@ -455,13 +407,6 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
     mesh = meshio.read(fname+"-mesh.vtk")
     mesh.points = mesh.points[:, :2]
     meshio.write(fname+"-mesh.xdmf", mesh)
-
-    # gmsh.write(fname+"-mesh.vtk")
-    # gmsh.finalize()
-
-    # mesh = meshio.read(fname+"-mesh.vtk")
-    # mesh.points = mesh.points[:, :2]
-    # meshio.write(fname+"-mesh.xdmf", mesh)
 
     colomn = 2 * row
     number_of_cells = 2 * row * colomn
@@ -477,26 +422,21 @@ def voronoi(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
     phi = (vol - Vs0)/vol
     print("porosity:" +str(phi))
-    return(phi)
-
-
+    return (phi)
 
 def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
-    import math
-    import meshio
+    import dolfin
     import gmsh
+    import math
+    import matplotlib.pyplot as plt
+    import meshio
+    import numpy
     import os
     import pickle
-    import dolfin
-    import numpy as np
-    from scipy.spatial import Delaunay
-    import matplotlib.pyplot as plt
-    from scipy.spatial import Voronoi, voronoi_plot_2d
+    import scipy
 
-
-    ########## Initialization#######################################################
-
+    ########## Initialization ######################################################
 
     gmsh.initialize()
     gmsh.clear()
@@ -507,6 +447,7 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
     lcar = h/5
     l = 0
+
     ############# Funtions #########################################################
 
     def line_btw_points(P, Q):
@@ -553,7 +494,6 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
             y = (a1 * c2 - a2 * c1)/determinant
             return [x, y]
 
-
     def vertice_generator(P, Q, S):
         a1, b1, c1 = line_btw_points(P, Q)
         a2, b2, c2 = line_btw_points(Q, S)
@@ -576,12 +516,10 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
         return neighbors
 
-
     def one_points_intersection(neighbor_vertices, vertices, lines):
 
         lines.append([vertices[neighbor_vertices[0]][1]])
         return lines
-
 
     def two_points_intersection(neighbor_vertices, vertices, lines):
         mid_point = vertices[neighbor_vertices[0]][1]
@@ -591,7 +529,6 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
         mid_point_num = neighbor_vertices[0]
         side_point_1_num = neighbor_vertices[1]
         side_point_2_num = neighbor_vertices[2]
-
 
         m1, c1 = line_2_points(mid_point,side_point_1)
         beta = math.atan(m1)
@@ -610,7 +547,6 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
             point_up_1 = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
             c1_up = point_up_1[1] - m1 * point_up_1[0]
 
-
         m2, c2 = line_2_points(mid_point,side_point_2)
         beta = math.atan(m2)
         sin = math.sin(beta)
@@ -627,9 +563,6 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
             c2_down = point_down_2[1] - m2 * point_down_2[0]
             point_up_2 = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
             c2_up = point_up_2[1] - m2 * point_up_2[0]
-
-
-
 
         mid_point_up = lines_Intersect(m1, c1_up, m2, c2_down)
         mid_point_down = lines_Intersect(m1, c1_down, m2, c2_up)
@@ -655,11 +588,10 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
         side_point_2_num = neighbor_vertices[2]
         side_point_3_num = neighbor_vertices[3]
 
-
-        m = np.zeros(3)
-        c = np.zeros(3)
-        c_up = np.zeros(3)
-        c_down = np.zeros(3)
+        m = numpy.zeros(3)
+        c = numpy.zeros(3)
+        c_up = numpy.zeros(3)
+        c_down = numpy.zeros(3)
         for i in range(len(side_points)):
             m[i], c[i] = line_2_points(mid_point, side_points[i])
             beta = math.atan(m[i])
@@ -678,8 +610,6 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
                 point_up = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
                 c_up[i] = point_up[1] - m[i] * point_up[0]
 
-
-
         gamma2 = getAngle(side_points[0], mid_point, side_points[1])
         gamma3 = getAngle(side_points[0], mid_point, side_points[2])
         # If clockwise:
@@ -694,17 +624,12 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
             mid_point_23 = lines_Intersect(m[1], c_down[1], m[2], c_up[2])
             mid_point_31 = lines_Intersect(m[2], c_down[2], m[0], c_up[0])
 
-
         lines.append([mid_point_num, [side_point_1_num , side_point_2_num, mid_point_12], [side_point_2_num, side_point_3_num, mid_point_23], [side_point_3_num, side_point_1_num, mid_point_31]])
         return lines
 
 #### ###########################################
 
-#  domain = 10
-
-
     file_name = "point_seeds_random"
-    # file_name = "point_seeds"
     open_file = open(file_name, "rb")
     points = pickle.load(open_file)
     open_file.close()
@@ -712,23 +637,19 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
     if (seeds_remove is True): 
         os.remove("point_seeds")  # Deleting the seeds file, created in seeds.py
 
-    vor = Voronoi(points)
-    # fig = voronoi_plot_2d(vor)
-    # plt.savefig('Voronoi.jpg')
+    vor = scipy.spatial.Voronoi(points)
     num = len(points)
 
-    period_neighbor_points_1 = np.zeros((num,2))
-    period_neighbor_points_2 = np.zeros((num,2))
-    period_neighbor_points_3 = np.zeros((num,2))
-    period_neighbor_points_4 = np.zeros((num,2))
-    period_neighbor_points_5 = np.zeros((num,2))
-    period_neighbor_points_6 = np.zeros((num,2))
-    period_neighbor_points_7 = np.zeros((num,2))
-    period_neighbor_points_8 = np.zeros((num,2))
+    period_neighbor_points_1 = numpy.zeros((num,2))
+    period_neighbor_points_2 = numpy.zeros((num,2))
+    period_neighbor_points_3 = numpy.zeros((num,2))
+    period_neighbor_points_4 = numpy.zeros((num,2))
+    period_neighbor_points_5 = numpy.zeros((num,2))
+    period_neighbor_points_6 = numpy.zeros((num,2))
+    period_neighbor_points_7 = numpy.zeros((num,2))
+    period_neighbor_points_8 = numpy.zeros((num,2))
 
-
-    domain_x = domain_y * np.sqrt(3)/1.5
-    
+    domain_x = domain_y * numpy.sqrt(3)/1.5
 
     for i in range(len(points)):
         period_neighbor_points_1[i][0] = points[i][0] - domain_x
@@ -754,16 +675,13 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
         period_neighbor_points_8[i][0] = points[i][0] + domain_x
         period_neighbor_points_8[i][1] = points[i][1] - domain_y
-
     
-    points = np.concatenate((points, period_neighbor_points_1, period_neighbor_points_2, period_neighbor_points_3, period_neighbor_points_4, period_neighbor_points_5, period_neighbor_points_6, period_neighbor_points_7, period_neighbor_points_8))
+    points = numpy.concatenate((points, period_neighbor_points_1, period_neighbor_points_2, period_neighbor_points_3, period_neighbor_points_4, period_neighbor_points_5, period_neighbor_points_6, period_neighbor_points_7, period_neighbor_points_8))
 
-    tri = Delaunay(points)
-
+    tri = scipy.spatial.Delaunay(points)
 
     plt.plot(points[:,0], points[:,1], 'o')
     plt.triplot(points[:,0], points[:,1], tri.simplices)
-
 
     # Put each triangle corners in one group
 
@@ -776,16 +694,14 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
     for i in range(number_of_triangels):
         vertices.append([triangles_cor[i], vertice_generator(points[triangles_cor[i, 0]], points[triangles_cor[i, 1]], points[triangles_cor[i, 2]])])
 
-
     # Find the neighbour triangles
     neighbor_triangles_by_number = []
     for i in range(number_of_triangels):
         neighbor_triangles_by_number.append(find_neighbour_triangles(i, triangles_cor[i], triangles_cor))
 
-
     # Put neighbour triangles vertices in one group which shows the ridge of Voronoi tessellation
 
-    lines = []      # lines contains each triangle (vertice) number with the side points
+    lines = [] # lines contains each triangle (vertice) number with the side points
     for i in range (len(neighbor_triangles_by_number)):
         if len(neighbor_triangles_by_number[i]) == 2:
             lines = one_points_intersection(neighbor_triangles_by_number[i], vertices, lines)
@@ -794,12 +710,8 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
         if len(neighbor_triangles_by_number[i]) == 4:
             lines = three_points_intersection(neighbor_triangles_by_number[i], vertices, lines)
 
-
-
     surfaces = []
-
     for i in range(len(neighbor_triangles_by_number)):
-
         if len(neighbor_triangles_by_number[i]) == 4:
             point = vertices[i][1]
             for j in range(len(neighbor_triangles_by_number[i])-1):
@@ -831,13 +743,10 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
                     surfaces.append([i, neighbor_num, l])
 
-    # shift_y = 0
-    # shift_y = -0.2
-    # gmsh.initialize()
-    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, 0+shift_y, 0, lcar), occ.addPoint(domain_x, 0+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, 0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(0, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(0, domain_y+shift_y, 0, lcar), occ.addPoint(0, 0+shift_y, 0, lcar))])], 20000)
+    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(       0,        0+shift_y, 0, lcar), occ.addPoint(domain_x,        0+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x,        0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(       0, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(       0, domain_y+shift_y, 0, lcar), occ.addPoint(       0,        0+shift_y, 0, lcar))])], 20000)
 
     base = 'occ.fuse([(2,1)], [(2,2)'
     for i in range(l-2):
@@ -853,14 +762,10 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
 
     frame = occ.cut([(2, 20000)], [(2, 30000)])
 
-    # occ.synchronize()
-    # gmsh.fltk.run()
-    
-
-    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, 0+shift_y, 0, lcar), occ.addPoint(domain_x, 0+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, 0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(0, domain_y+shift_y, 0, lcar)),\
-                                        occ.addLine(occ.addPoint(0, domain_y+shift_y, 0, lcar), occ.addPoint(0, 0+shift_y, 0, lcar))])], 20001)
+    occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(       0,        0+shift_y, 0, lcar), occ.addPoint(domain_x,        0+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x,        0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(       0, domain_y+shift_y, 0, lcar)),\
+                                           occ.addLine(occ.addPoint(       0, domain_y+shift_y, 0, lcar), occ.addPoint(       0,        0+shift_y, 0, lcar))])], 20001)
 
     base = 'occ.cut([(2, 20001)], [(2, 1)'
     for i in range(len(frame[0])-1):
@@ -870,11 +775,9 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
     exec(command)
     
     gmsh.option.setNumber("Mesh.MeshSizeMax", lcar)
-
     
     occ.synchronize()
     mat = gmsh.model.addPhysicalGroup(2, [40000])
-    # gmsh.model.geo.rotate(gmsh.model.occ.getEntities(40000), 0, 0, 0, 0, 1, 1, math.pi / 4)
     
     zmin = 0; zmax = 0
     ymin = 0+shift_y; ymax = domain_y+shift_y
@@ -925,13 +828,6 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
     mesh.points = mesh.points[:, :2]
     meshio.write(fname+"-mesh.xdmf", mesh)
 
-    # gmsh.write(fname+"-mesh.vtk")
-    # gmsh.finalize()
-
-    # mesh = meshio.read(fname+"-mesh.vtk")
-    # mesh.points = mesh.points[:, :2]
-    # meshio.write(fname+"-mesh.xdmf", mesh)
-
     colomn = 2 * row
     number_of_cells = 2 * row * colomn
 
@@ -948,16 +844,16 @@ def voronoi_tessellation(fname, h, row, domain_y, shift_y, seeds_remove = True):
     print("porosity:" +str(phi))
     return(phi)
 
-
 def Hallow_Square(fname, width, r, shift_x, shift_y):
 
+    import dolfin
     import gmsh
-    import os
     import math
     import meshio
-    import dolfin
+    import os
 
     ###################################################################################################################################################################
+
     center = width/2
     xmin = 0.
     ymin = 0.
@@ -971,7 +867,6 @@ def Hallow_Square(fname, width, r, shift_x, shift_y):
     r0 = r
     l = width/50 
     e = 1e-6
-
 
     def setPeriodic(coord):
         # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
@@ -1013,35 +908,19 @@ def Hallow_Square(fname, width, r, shift_x, shift_y):
     rve_tag = 7
 
     gmsh.model.occ.addRectangle(x=xmin+shift_x, y=ymin+shift_y, z=0, dx=xmax-xmin, dy=ymax-ymin, tag=box_tag)
-    # gmsh.model.occ.addDisk(xc=x0, yc=y0, zc=0, rx=r0, ry=r0, tag=hole_tag)
     gmsh.model.occ.addDisk(xc=xmin, yc=ymin, zc=0, rx=r0, ry=r0, tag=hole_tag2)
     gmsh.model.occ.addDisk(xc=xmax, yc=ymin, zc=0, rx=r0, ry=r0, tag=hole_tag3)
     gmsh.model.occ.addDisk(xc=xmax, yc=ymax, zc=0, rx=r0, ry=r0, tag=hole_tag4)
     gmsh.model.occ.addDisk(xc=xmin, yc=ymax, zc=0, rx=r0, ry=r0, tag=hole_tag5)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2), (2, hole_tag3), (2, hole_tag4), (2, hole_tag5)], tag=rve_tag)
     gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag2), (2, hole_tag3), (2, hole_tag4), (2, hole_tag5)], tag=rve_tag)
-    # gmsh.model.geo.rotate(rve_tag, 0, 0, 0, 0, 0, 1, math.pi / 4)
     gmsh.model.occ.synchronize()
     gmsh.model.addPhysicalGroup(dim=2, tags=[rve_tag])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[2], tagsMaster=[1], affineTransform=[1, 0, 0, xmax-xmin,\
-    #                                                                                 0, 1, 0, 0        ,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[4], tagsMaster=[3], affineTransform=[1, 0, 0, 0        ,\
-    #                                                                                 0, 1, 0, ymax-ymin,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-
     
     setPeriodic(0)
     setPeriodic(1)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=l)
     gmsh.model.mesh.generate(dim=2)
 
-
-    # gmsh.model.mesh.generate()
     gmsh.write(fname + '.msh')
     os.system("gmsh -2 -o " + fname + ".msh -format msh22 " + fname + ".msh")
     os.system("dolfin-convert " + fname + ".msh " +  fname + ".xml")
@@ -1067,13 +946,14 @@ def Hallow_Square(fname, width, r, shift_x, shift_y):
 
 def Porous_media(fname, width, r, shift_x, shift_y):
 
+    import dolfin
     import gmsh
-    import os
     import math
     import meshio
-    import dolfin
+    import os
 
     ###################################################################################################################################################################
+    
     center = width/2
     xmin = 0.
     ymin = 0.
@@ -1087,7 +967,6 @@ def Porous_media(fname, width, r, shift_x, shift_y):
     r0 = r
     l = width/50 
     e = 1e-6
-
 
     def setPeriodic(coord):
         # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
@@ -1129,35 +1008,19 @@ def Porous_media(fname, width, r, shift_x, shift_y):
     rve_tag = 7
 
     gmsh.model.occ.addRectangle(x=xmin+shift_x, y=ymin+shift_y, z=0, dx=xmax-xmin, dy=ymax-ymin, tag=box_tag)
-    # gmsh.model.occ.addDisk(xc=x0, yc=y0, zc=0, rx=r0, ry=r0, tag=hole_tag)
     gmsh.model.occ.addDisk(xc=xmin, yc=(ymin+ymax)*5/8, zc=0, rx=r0, ry=r0, tag=hole_tag2)
     gmsh.model.occ.addDisk(xc=xmin, yc=ymin, zc=0, rx=r0, ry=r0, tag=hole_tag3)
     gmsh.model.occ.addDisk(xc=(xmax + xmin)*5/8, yc=(ymax + ymin)/2, zc=0, rx=r0, ry=r0, tag=hole_tag4)
     gmsh.model.occ.addDisk(xc=xmax, yc=(ymax+ymin)*3/4, zc=0, rx=r0, ry=r0, tag=hole_tag5)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2), (2, hole_tag3), (2, hole_tag4), (2, hole_tag5)], tag=rve_tag)
     gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag2), (2, hole_tag3), (2, hole_tag4), (2, hole_tag5)], tag=rve_tag)
-    # gmsh.model.geo.rotate(rve_tag, 0, 0, 0, 0, 0, 1, math.pi / 4)
     gmsh.model.occ.synchronize()
     gmsh.model.addPhysicalGroup(dim=2, tags=[rve_tag])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[2], tagsMaster=[1], affineTransform=[1, 0, 0, xmax-xmin,\
-    #                                                                                 0, 1, 0, 0        ,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[4], tagsMaster=[3], affineTransform=[1, 0, 0, 0        ,\
-    #                                                                                 0, 1, 0, ymax-ymin,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-
     
     setPeriodic(0)
     setPeriodic(1)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=l)
     gmsh.model.mesh.generate(dim=2)
 
-
-    # gmsh.model.mesh.generate()
     gmsh.write(fname + '.msh')
     os.system("gmsh -2 -o " + fname + ".msh -format msh22 " + fname + ".msh")
     os.system("dolfin-convert " + fname + ".msh " +  fname + ".xml")
@@ -1183,13 +1046,14 @@ def Porous_media(fname, width, r, shift_x, shift_y):
 
 def Hallow_cube(fname, width, r, shift_x, shift_y, shift_z):
 
+    import dolfin
     import gmsh
-    import os
     import math
     import meshio
-    import dolfin
+    import os
 
     ###################################################################################################################################################################
+
     center = width/2
     xmin = 0.
     ymin = 0.
@@ -1203,7 +1067,6 @@ def Hallow_cube(fname, width, r, shift_x, shift_y, shift_z):
     r0 = r
     l = width/10
     e = 1e-6
-
 
     def setPeriodic(coord):
         # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
@@ -1266,7 +1129,6 @@ def Hallow_cube(fname, width, r, shift_x, shift_y, shift_z):
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=l)
     gmsh.model.mesh.generate(dim=3)
 
-    # gmsh.model.mesh.generate()
     gmsh.write(fname + '.msh')
     os.system("gmsh -2 -o " + fname + ".msh -format msh22 " + fname + ".msh")
     os.system("dolfin-convert " + fname + ".msh " +  fname + ".xml")
@@ -1287,19 +1149,15 @@ def Hallow_cube(fname, width, r, shift_x, shift_y, shift_z):
 
 def Hallow_array(fname, shift_x, shift_y, width):
 
+    import dolfin
     import gmsh
-    import os
     import math
     import meshio
-    import dolfin
+    import os
 
     ###################################################################################################################################################################
 
-    # dist = 0.25
-    # width = 3 * dist
     dist = width/3
-    # shift_x = dist/2
-    # shift_y = dist/2
 
     xmin = 0.
     ymin = 0.
@@ -1310,8 +1168,6 @@ def Hallow_array(fname, shift_x, shift_y, width):
     r0 = dist/5
     l = dist/50
     e = 1e-6
-
-    
 
     def setPeriodic(coord):
         # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
@@ -1388,37 +1244,19 @@ def Hallow_array(fname, shift_x, shift_y, width):
     gmsh.model.occ.addDisk(xc=xmin + dist, yc=ymax, zc=0, rx=r0, ry=r0, tag=hole_tag42)
     gmsh.model.occ.addDisk(xc=xmin + 2*dist, yc=ymax, zc=0, rx=r0, ry=r0, tag=hole_tag43)
     gmsh.model.occ.addDisk(xc=xmax, yc=ymax, zc=0, rx=r0, ry=r0, tag=hole_tag44)
-
     
-
-    
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2), (2, hole_tag3), (2, hole_tag4), (2, hole_tag5)], tag=rve_tag)
     gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag11), (2, hole_tag12), (2, hole_tag13), (2, hole_tag14),\
                                                                   (2, hole_tag21), (2, hole_tag22), (2, hole_tag23), (2, hole_tag24),
                                                                   (2, hole_tag31), (2, hole_tag32), (2, hole_tag33), (2, hole_tag34),
                                                                   (2, hole_tag41), (2, hole_tag42), (2, hole_tag43), (2, hole_tag44)], tag=rve_tag)
-    # gmsh.model.geo.rotate(rve_tag, 0, 0, 0, 0, 0, 1, math.pi / 4)
     gmsh.model.occ.synchronize()
     gmsh.model.addPhysicalGroup(dim=2, tags=[rve_tag])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[2], tagsMaster=[1], affineTransform=[1, 0, 0, xmax-xmin,\
-    #                                                                                 0, 1, 0, 0        ,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[4], tagsMaster=[3], affineTransform=[1, 0, 0, 0        ,\
-    #                                                                                 0, 1, 0, ymax-ymin,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-
     
     setPeriodic(0)
     setPeriodic(1)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=l)
     gmsh.model.mesh.generate(dim=2)
 
-
-    # gmsh.model.mesh.generate()
     gmsh.write(fname + '.msh')
     os.system("gmsh -2 -o " + fname + ".msh -format msh22 " + fname + ".msh")
     os.system("dolfin-convert " + fname + ".msh " +  fname + ".xml")
@@ -1430,22 +1268,20 @@ def Hallow_array(fname, shift_x, shift_y, width):
     mesh.points = mesh.points[:, :2]
     meshio.write(fname+"-mesh.xdmf", mesh)
 
-
-
-
 def Hexag_incl(fname, width, angle, r, shift_x, shift_y):
 
-    import math
     import gmsh
-    import os
+    import math
     import meshio
+    import os
 
     gmsh.initialize()
     gmsh.clear()
     model = gmsh.model
     occ = model.occ
 
-        ############# Parameters #######################################################
+    ############# Parameters #######################################################
+
     a = width
     R = r
     t = angle
@@ -1453,7 +1289,9 @@ def Hexag_incl(fname, width, angle, r, shift_x, shift_y):
     c = a * math.cos(t)
 
     lcar = a/50
-        ############# Funtions #########################################################
+
+    ############# Funtions #########################################################
+
     xmin = 0; xmax = c
     ymin = 0; ymax = b
     zmin = 0; zmax = 0
@@ -1464,11 +1302,6 @@ def Hexag_incl(fname, width, angle, r, shift_x, shift_y):
                                         occ.addLine(occ.addPoint(a+c, b, 0, lcar), occ.addPoint(c, b, 0, lcar)),\
                                         occ.addLine(occ.addPoint(c, b, 0, lcar), occ.addPoint(0, 0, 0, lcar))])], 1)
 
-    # occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0+3*r, 0+3*r, 0, lcar), occ.addPoint(a+3*r, 0+3*r, 0, lcar)),\
-    #                                     occ.addLine(occ.addPoint(a+3*r, 0+3*r, 0, lcar), occ.addPoint(a+c+3*r, b+3*r, 0, lcar)),\
-    #                                     occ.addLine(occ.addPoint(a+c+3*r, b+3*r, 0, lcar), occ.addPoint(c+3*r, b+3*r, 0, lcar)),\
-    #                                     occ.addLine(occ.addPoint(c+3*r, b+3*r, 0, lcar), occ.addPoint(0+3*r, 0+3*r, 0, lcar))])], 1)
-    
     occ.addDisk(xc=0+shift_x, yc=0+shift_y, zc=0, rx=R, ry=R, tag=2)
     occ.addDisk(xc=a+shift_x, yc=0+shift_y, zc=0, rx=R, ry=R, tag=3)
     occ.addDisk(xc=a+c+shift_x, yc=b+shift_y, zc=0, rx=R, ry=R, tag=4)
@@ -1508,13 +1341,10 @@ def Hexag_incl(fname, width, angle, r, shift_x, shift_y):
 
     gmsh.initialize()
 
-
     setPeriodic(0)
     setPeriodic(1)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=lcar)
     gmsh.model.mesh.generate(dim=2)
-
-
 
     # gmsh.model.mesh.generate()
     gmsh.write(fname + '.msh')
@@ -1527,8 +1357,6 @@ def Hexag_incl(fname, width, angle, r, shift_x, shift_y):
     mesh = meshio.read(fname+"-mesh.vtk")
     mesh.points = mesh.points[:, :2]
     meshio.write(fname+"-mesh.xdmf", mesh)
-
-
 
 def Hexg(fname, phi, R):
 
@@ -1543,6 +1371,7 @@ def Hexg(fname, phi, R):
     occ = model.occ
 
     ##########################################################
+
     h = R*(1 - phi)
     L = R + h
     lcar = h/10
@@ -1565,28 +1394,12 @@ def Hexg(fname, phi, R):
 
         occ.cut(objectDimTags=[(2, k)], toolDimTags=[(2, k+1)], tag=k+2)
 
-    # occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, L, 0, lcar), occ.addPoint(L * math.sqrt(3)/2, L/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(L * math.sqrt(3)/2, L/2, 0, lcar), occ.addPoint(L * math.sqrt(3)/2, -L/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(L * math.sqrt(3)/2, -L/2, 0, lcar), occ.addPoint(0, -L, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(0, -L, 0, lcar), occ.addPoint(-L * math.sqrt(3)/2, -L/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(-L * math.sqrt(3)/2, -L/2, 0, lcar), occ.addPoint(-L * math.sqrt(3)/2, L/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(-L * math.sqrt(3)/2, L/2, 0, lcar), occ.addPoint(0, L, 0, lcar))])], 1)
-
-    # occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, R, 0, lcar), occ.addPoint(R * math.sqrt(3)/2, R/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(R * math.sqrt(3)/2, R/2, 0, lcar), occ.addPoint(R * math.sqrt(3)/2, -R/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(R * math.sqrt(3)/2, -R/2, 0, lcar), occ.addPoint(0, -R, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(0, -R, 0, lcar), occ.addPoint(-R * math.sqrt(3)/2, -R/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(-R * math.sqrt(3)/2, -R/2, 0, lcar), occ.addPoint(-R * math.sqrt(3)/2, R/2, 0, lcar)),\
-    #                                        occ.addLine(occ.addPoint(-R * math.sqrt(3)/2, R/2, 0, lcar), occ.addPoint(0, R, 0, lcar))])], 2)
-
-    # occ.cut(objectDimTags=[(2, 1)], toolDimTags=[(2, 2)], tag=3)
     hexagon_generator(0, 0, 10)
     hexagon_generator((2*R + h)*math.sqrt(3)/2, 0, 20)
     hexagon_generator((2*R + h)*math.sqrt(3)/4, (2*R + h)*3/4, 30)
     hexagon_generator((2*R + h)*math.sqrt(3)/4, -(2*R + h)*3/4, 40)
     occ.fuse([(2,12)], [(2,22), (2, 32), (2, 42)], 50)
     shift = 0
-    # shift = -R/5
     xmin = 0; dx = (2*R+h)*math.sqrt(3)/2; xmax = xmin + dx
     ymin = -L/2+shift; dy = (2*R+h)*3/2; ymax = ymin + dy
     zmin = 0; zmax = 0
@@ -1596,12 +1409,10 @@ def Hexg(fname, phi, R):
     occ.addRectangle(x=xmin, y=ymin- R/2, z=0, dx=dx, dy=-dy, tag=300)
     occ.addRectangle(x=xmin, y=ymax-R/2, z=0, dx=dx, dy=dy, tag=400)
     occ.cut(objectDimTags=[(2, 50)], toolDimTags=[(2, 100), (2, 200), (2, 300), (2, 400)], tag=1000)
-    # occ.rotate([(2, 1000)], 0, 0, 0, 0, 0, 1, math.pi/2)
     occ.synchronize()
 
     gmsh.model.addPhysicalGroup(2, [1000])
-    # out = gmsh.model.occ.copy([(2, 1000)])
-    # occ.translate(out, dx, 0, 0)
+
     def setPeriodic(coord):
         # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
         smin = gmsh.model.getEntitiesInBoundingBox(xmin - e, ymin - e, zmin - e,
@@ -1631,14 +1442,10 @@ def Hexg(fname, phi, R):
                                                                     0, 0, 1, dz,\
                                                                     0, 0, 0, 1 ])
 
-    # gmsh.initialize()
-
-
     setPeriodic(0)
     setPeriodic(1)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=lcar)
     gmsh.model.mesh.generate(dim=2)
-    # gmsh.write('Hexg.msh')
     gmsh.write(fname + '.msh')
     os.system("gmsh -2 -o " + fname + ".msh -format msh22 " + fname + ".msh")
     os.system("dolfin-convert " + fname + ".msh " +  fname + ".xml")
@@ -1650,17 +1457,16 @@ def Hexg(fname, phi, R):
     mesh.points = mesh.points[:, :2]
     meshio.write(fname+"-mesh.xdmf", mesh)
 
-
 def Hex_rectangle(fname, width, r, shift_x, shift_y):
-    
 
+    import dolfin
     import gmsh
-    import os
     import math
     import meshio
-    import dolfin
+    import os
 
     ###################################################################################################################################################################
+
     length = width * math.sqrt(3)
     xmin = 0.
     ymin = 0.
@@ -1674,7 +1480,6 @@ def Hex_rectangle(fname, width, r, shift_x, shift_y):
     r0 = r
     l = width/40
     e = 1e-6
-
 
     def setPeriodic(coord):
         # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
@@ -1717,7 +1522,6 @@ def Hex_rectangle(fname, width, r, shift_x, shift_y):
     hole_tag6 = 7
     rve_tag = 8
 
-
     gmsh.model.occ.addRectangle(x=xmin+shift_x, y=ymin+shift_y, z=0, dx=xmax-xmin, dy=ymax-ymin, tag=box_tag)
     gmsh.model.occ.addDisk(xc=x0, yc=y0, zc=0, rx=r0, ry=r0, tag=hole_tag)
     gmsh.model.occ.addDisk(xc=xmin, yc=ymin, zc=0, rx=r0, ry=r0, tag=hole_tag2)
@@ -1725,28 +1529,13 @@ def Hex_rectangle(fname, width, r, shift_x, shift_y):
     gmsh.model.occ.addDisk(xc=xmax, yc=ymax, zc=0, rx=r0, ry=r0, tag=hole_tag4)
     gmsh.model.occ.addDisk(xc=xmin, yc=ymax, zc=0, rx=r0, ry=r0, tag=hole_tag5)
     gmsh.model.occ.addDisk(xc=x0 + xmax - xmin, yc=y0, zc=0, rx=r0, ry=r0, tag=hole_tag6)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2)], tag=rve_tag)
     gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag), (2, hole_tag2), (2, hole_tag3), (2, hole_tag4), (2, hole_tag5), (2, hole_tag6)], tag=rve_tag)
-    # gmsh.model.occ.cut(objectDimTags=[(2, box_tag)], toolDimTags=[(2, hole_tag2), (2, hole_tag3), (2, hole_tag4), (2, hole_tag5)], tag=rve_tag)
-    # gmsh.model.geo.rotate(rve_tag, 0, 0, 0, 0, 0, 1, math.pi / 4)
     gmsh.model.occ.synchronize()
     gmsh.model.addPhysicalGroup(dim=2, tags=[rve_tag])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[2], tagsMaster=[1], affineTransform=[1, 0, 0, xmax-xmin,\
-    #                                                                                 0, 1, 0, 0        ,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-    # gmsh.model.mesh.setPeriodic(dim=1, tags=[4], tagsMaster=[3], affineTransform=[1, 0, 0, 0        ,\
-    #                                                                                 0, 1, 0, ymax-ymin,\
-    #                                                                                 0, 0, 1, 0        ,\
-    #                                                                                 0, 0, 0, 1        ])
-
     
     setPeriodic(0)
     setPeriodic(1)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=l)
-    # gmsh.model.mesh.generate(dim=2)
-
 
     gmsh.model.mesh.generate()
     gmsh.write(fname + '.msh')
@@ -1772,18 +1561,17 @@ def Hex_rectangle(fname, width, r, shift_x, shift_y):
     phi = (vol - Vs0)/vol
     print("porosity:" +str(phi))
 
-
-
 def TKD(fname, l, h):
+
+    import dolfin
     import gmsh
-    import os
     import math
     import meshio
-    import dolfin
-
+    import os
     
     ###################################################################################################################################################################
-    l =1
+
+    l = 1
     h = 0.1
     lcar = h/5
 
@@ -1793,14 +1581,6 @@ def TKD(fname, l, h):
     occ = model.occ
     occ.mesh.ToleranceInitialDelaunay=1e-12
     model.mesh.ToleranceInitialDelaunay=1e-12
-
-    # occ.mesh.MinimumCircleNodes=16
-    # occ.mesh.MinimumCurveNodes=16
-    # occ.mesh.MinimumCirclePoints=16
-    # occ.mesh.MinimumCurvePoints=16
-    # occ.mesh.MeshSizeFromCurvature=16
-    # occ.mesh.MeshSizeFromPoints=0
-    # occ.mesh.MeshSizeFromParametricPoints=0
 
     p1 = occ.addPoint(0, 0, l, lcar)
     p2 = occ.addPoint(0, 0, -l, lcar)
@@ -1820,7 +1600,6 @@ def TKD(fname, l, h):
 
     occ.addVolume([occ.addSurfaceLoop([s1, s2, s3, s4, s5, s6, s7, s8])], 100)
 
-    
     def setPeriodic(coord):
         # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
         smin = gmsh.model.getEntitiesInBoundingBox(xmin - e, ymin - e, zmin - e,
@@ -1850,8 +1629,6 @@ def TKD(fname, l, h):
                                                                     0, 0, 1, dz,\
                                                                     0, 0, 0, 1 ])
 
-    # setPeriodic(0)
-    # setPeriodic(1)
     occ.mesh.ToleranceInitialDelaunay=1e-12
     occ.synchronize()
     gmsh.model.mesh.ToleranceInitialDelaunay=1e-12
@@ -1868,4 +1645,3 @@ def TKD(fname, l, h):
     mesh = meshio.read(fname+"-mesh.vtk")
     mesh.points = mesh.points[:, :2]
     meshio.write(fname+"-mesh.xdmf", mesh)
-
