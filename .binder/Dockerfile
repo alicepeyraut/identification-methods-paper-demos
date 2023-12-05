@@ -10,7 +10,7 @@ FROM registry.gitlab.inria.fr/mgenet/micro-macro-poro-paper-demos:latest
 
 # Fix ImageMagick, cf. https://stackoverflow.com/a/59193253
 USER root
-RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml 
+RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
 ARG NB_USER=jovyan
 USER ${NB_USER}
 
