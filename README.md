@@ -1,3 +1,3 @@
-# Welcome to [Manoochehrtayebi, Bel-Brunon & Genet, Submitted]'s demos!
+# Welcome to [Peyraut & Genet, Submitted]'s demos!
 
-Interactive demos can be found at https://mgenet.gitlabpages.inria.fr/micro-macro-poro-paper-demos.
+Interactive demos can be found at https://gitlab.inria.fr/apeyraut/gravity-modeling-papers-demo.
