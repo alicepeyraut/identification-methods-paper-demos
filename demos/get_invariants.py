@@ -2,7 +2,7 @@
 
 ################################################################################
 ###                                                                          ###
-### Created by Martin Genet, 2018-2023                                       ###
+### Created by Alice Peyraut, 2023-2024                                      ###
 ###                                                                          ###
 ### École Polytechnique, Palaiseau, France                                   ###
 ###                                                                          ###
@@ -10,7 +10,6 @@
 
 import dolfin
 import numpy
-import sympy
 
 import dolfin_mech as dmech
 
@@ -23,10 +22,12 @@ def get_invariants(
         lognorm=True):
 
     ################################################################### Computing displacement field from end-exhalation to end-inhalation ###
+
     U_tot = U_inhal.copy(deepcopy=True)
     U_tot.vector().set_local(U_inhal.vector()[:] - U_exhal.vector()[:])
 
     ################################################################### Defining function spaces ###
+
     dolfin.ALE.move(mesh, U_exhal)
 
     fe_u = dolfin.VectorElement(
@@ -47,9 +48,11 @@ def get_invariants(
     U_tot_mesh.vector().set_local(U_tot.vector()[:]) ### only necessary because using directly U_tot causes dolfin errors for some reason
 
     ################################################################### Defining kinematics ###
+    
     kinematics_new = dmech.Kinematics(U=U_tot_mesh, U_old=None, Q_expr=None)
 
     ################################################################### Retrieving the invariants values on the mesh ###
+    
     J_tot_field = kinematics_new.J
     J_tot_proj = dolfin.project(J_tot_field, sfoi_fs)
     J_tot = J_tot_proj.vector().get_local()
@@ -79,6 +82,7 @@ def get_invariants(
         subdomain_lst[zone_+1].mark(domains_zones, 10-(zone_+1))
 
     ################################################################### Computing the invariants for each of the 10 zones ###
+    
     results_zones = {}
 
     if not lognorm:
@@ -109,6 +113,7 @@ def get_invariants(
     else:
 
         ################################################################### Computing mu(invariants) ###
+        
         mu_J_tot, mu_Ic_tot, mu_IIc_tot = 0, 0, 0
         
         number_cells = 0
@@ -122,6 +127,7 @@ def get_invariants(
         mu_IIc_tot /= number_cells
 
         ################################################################### Computing sigma(invariants) ###
+        
         sigma_J_tot, sigma_Ic_tot, sigma_IIc_tot = 0, 0, 0
 
         compteur = 0
@@ -164,4 +170,3 @@ def get_invariants(
             results_zones["I2^"].append(I2_chapeau)
 
         return(results_zones)
-      

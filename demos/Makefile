@@ -17,7 +17,7 @@ clean_notebooks:
 
 OUTPUT_FORMATS := aux fdb_latexmk fls h5 log msh out pdf sta synctex.gz tex tex.bu vtk xdmf xml
 OUTPUT_FILES := $(foreach format,$(OUTPUT_FORMATS),$(wildcard *.$(format)))
-DAT_FILES := $(filter-out Fig5-voronoi-seeds.dat, $(wildcard *.dat))
+DAT_FILES := $(wildcard *.dat)
 
 clean_output_files:
 	rm -f $(OUTPUT_FILES) $(DAT_FILES)
