@@ -67,7 +67,7 @@ def get_invariants(
 
     ################################################################### Splitting the mesh into 10 different zones ###
 
-    domains_zones = dolfin.MeshFunction('size_t', mesh, mesh.topology().dim())
+    domains_zones = dolfin.MeshFunction("size_t", mesh, mesh.topology().dim())
     domains_zones.set_all(10)
     tol =1e-14
     zmin = mesh.coordinates()[:, 2].min()
