@@ -21,12 +21,12 @@ def get_invariants(
         mesh=None,
         lognorm=True):
 
-    ################################################################### Computing displacement field from end-exhalation to end-inhalation ###
+    ###################################### Retrieving the displacement field ###
 
     U_tot = U_inhal.copy(deepcopy=True)
     U_tot.vector().set_local(U_inhal.vector()[:] - U_exhal.vector()[:])
 
-    ################################################################### Defining function spaces ###
+    ############################################### Defining function spaces ###
 
     dolfin.ALE.move(mesh, U_exhal)
 
@@ -47,11 +47,11 @@ def get_invariants(
     U_tot_mesh=dolfin.Function(U_fs)
     U_tot_mesh.vector().set_local(U_tot.vector()[:]) ### only necessary because using directly U_tot causes dolfin errors for some reason
 
-    ################################################################### Defining kinematics ###
+    #################################################### Defining kinematics ###
     
     kinematics_new = dmech.Kinematics(U=U_tot_mesh, U_old=None, Q_expr=None)
 
-    ################################################################### Retrieving the invariants values on the mesh ###
+    ########################### Retrieving the invariants values on the mesh ###
     
     J_tot_field = kinematics_new.J
     J_tot_proj = dolfin.project(J_tot_field, sfoi_fs)
@@ -65,7 +65,7 @@ def get_invariants(
     IIc_tot_proj = dolfin.project(IIc_tot_field, sfoi_fs)
     IIc_tot = IIc_tot_proj.vector().get_local()
 
-    ################################################################### Splitting the mesh into 10 different zones ###
+    ############################# Splitting the mesh into 10 different zones ###
 
     domains_zones = dolfin.MeshFunction("size_t", mesh, mesh.topology().dim())
     domains_zones.set_all(10)
@@ -81,7 +81,7 @@ def get_invariants(
         subdomain_lst.append(dolfin.CompiledSubDomain(" x[2] >= z1 - tol",  z1=zmin+delta_z*(zone_+1), tol=tol))
         subdomain_lst[zone_+1].mark(domains_zones, 10-(zone_+1))
 
-    ################################################################### Computing the invariants for each of the 10 zones ###
+    ###################### Computing the invariants for each of the 10 zones ###
     
     results_zones = {}
 
@@ -112,7 +112,7 @@ def get_invariants(
 
     else:
 
-        ################################################################### Computing mu(invariants) ###
+        ########################################### Computing mu(invariants) ###
         
         mu_J_tot, mu_Ic_tot, mu_IIc_tot = 0, 0, 0
         
@@ -126,7 +126,7 @@ def get_invariants(
         mu_Ic_tot /= number_cells
         mu_IIc_tot /= number_cells
 
-        ################################################################### Computing sigma(invariants) ###
+        ######################################## Computing sigma(invariants) ###
         
         sigma_J_tot, sigma_Ic_tot, sigma_IIc_tot = 0, 0, 0
 

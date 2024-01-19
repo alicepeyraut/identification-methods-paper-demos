@@ -1,6 +1,6 @@
 #!/bin/bash
 
-.PHONY: convert_notebooks clean_notebooks clean_output_files
+.PHONY: convert_notebooks clean_latex_files clean_output_files
 
 NOTEBOOKS := $(wildcard *.ipynb)
 LATEX_FILES := $(NOTEBOOKS:.ipynb=.tex)
@@ -10,7 +10,7 @@ convert_notebooks: $(LATEX_FILES)
 %.tex: %.ipynb
 	jupyter nbconvert --to latex $<
 
-clean_notebooks:
+clean_latex_files:
 	for file in *.tex; do sed -i '' '1,/^\\section/d' $${file}; done
 	for file in *.tex; do sed -i '' '/\\end{document}/,$$d' $${file}; done
 	for file in *.tex; do sed -i '' 's/section{/section*{/g' $${file}; done
