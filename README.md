@@ -1,3 +1,3 @@
 # Welcome to [Peyraut & Genet, Submitted]'s demos!
 
-Interactive demos can be found at https://gitlab.inria.fr/apeyraut/gravity-modeling-paper-demos.
+Interactive demos can be found at https://apeyraut.gitlabpages.inria.fr/gravity-modeling-paper-demos.
