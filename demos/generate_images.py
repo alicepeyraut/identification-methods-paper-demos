@@ -57,8 +57,7 @@ def generate_images(model_error_b=False):
 
     do_generate_images = 1
     do_generate_meshes = 1
-
-    do_run_warp                          = 1
+    do_run_warp = 1
 ################################################################################
 
 
