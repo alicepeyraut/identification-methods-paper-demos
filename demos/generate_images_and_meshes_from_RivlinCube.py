@@ -66,7 +66,6 @@ def generate_images_and_meshes_from_RivlinCube(
             const_params                           = const_params                      ,
             load_params                            = load_params                       ,
             res_basename                           = images_folder+"/"+working_basename,
-            mesh_modifs_params                     = {"refine": True}                              ,
             write_vtus_with_preserved_connectivity = True                              ,
             verbose                                = 1                                 )
 
@@ -104,28 +103,3 @@ def generate_images_and_meshes_from_RivlinCube(
 if (__name__ == "__main__"):
     import fire
     fire.Fire(generate_images_and_meshes_from_RivlinCube)
-
-    # import argparse
-    # from distutils.util import strtobool
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--images_n_dim"                , type=int  , choices=[2]        )
-    # parser.add_argument("--images_n_voxels"             , type=int                       )
-    # parser.add_argument("--deformation_type"     , type=str                       )
-    # parser.add_argument("--texture_type"         , type=str  , choices=["tagging"])
-    # parser.add_argument("--noise_level"          , type=float                     )
-    # parser.add_argument("--k_run"                , type=int                         , default=None)
-    # parser.add_argument("--run_model"            , type=lambda x: bool(strtobool(x)), default=True) # MG20220901: Watch out! All non empty strings evaluate to True!
-    # parser.add_argument("--generate_images"      , type=lambda x: bool(strtobool(x)), default=True) # MG20220901: Watch out! All non empty strings evaluate to True!
-
-    # args = parser.parse_args()
-    # # print (args.run_model)
-
-    # generate_images_and_meshes_from_RivlinCube(
-    #     images_n_dim            = args.images_n_dim,
-    #     images_n_voxels         = args.images_n_voxels,
-    #     deformation_type = args.deformation_type,
-    #     texture_type     = args.texture_type,
-    #     noise_level      = args.noise_level,
-    #     k_run            = args.k_run,
-    #     run_model        = args.run_model,
-    #     generate_images  = args.generate_images)
