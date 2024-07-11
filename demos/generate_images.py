@@ -46,7 +46,9 @@ def generate_images_and_meshes_from_RivlinCube(
             cube_params["Z0"] = 0.2
             cube_params["Z1"] = 0.8
         if refine:
-            cube_params["refine"]=True  ### writing refined mesh
+            mesh_modifs_params={"refine":True}  ### writing refined mesh
+        else:
+            mesh_modifs_params={}
 
         mat_params = {"model":"CGNH", "parameters":{"E":1., "nu":0.3}}
 
@@ -65,6 +67,7 @@ def generate_images_and_meshes_from_RivlinCube(
             step_params                            = step_params                       ,
             const_params                           = const_params                      ,
             load_params                            = load_params                       ,
+            mesh_modifs_params=mesh_modifs_params,
             res_basename                           = images_folder+"/"+working_basename,
             write_vtus_with_preserved_connectivity = True                              ,
             verbose                                = 1                                 )
