@@ -4,6 +4,7 @@
 
 import math
 import os
+import dolfin
 
 import myVTKPythonLibrary as myvtk
 import dolfin_mech        as dmech
@@ -21,8 +22,7 @@ def generate_images_and_meshes_from_RivlinCube(
         noise_level      : float = 0                ,
         k_run            : int   = None             ,
         run_model        : bool  = True             ,
-        generate_images  : bool  = True             ,
-        refine           :bool   = False):
+        generate_images  : bool  = True             ):
 
     if not os.path.exists(images_folder):
         os.mkdir(images_folder)
@@ -45,10 +45,6 @@ def generate_images_and_meshes_from_RivlinCube(
         if (images_n_dim == 3):
             cube_params["Z0"] = 0.2
             cube_params["Z1"] = 0.8
-        if refine:
-            mesh_modifs_params={"refine":True}  ### writing refined mesh
-        else:
-            mesh_modifs_params={}
 
         mat_params = {"model":"CGNH", "parameters":{"E":1., "nu":0.3}}
 
@@ -60,6 +56,12 @@ def generate_images_and_meshes_from_RivlinCube(
         elif (deformation_type == "grav"):
             load_params = {"type":"volu", "f":0.3}
 
+        #### writing files
+        mesh, boundaries_mf, xmin_id, xmax_id, ymin_id, ymax_id = dmech.run_RivlinCube_Mesh(dim=images_n_dim, params=cube_params)
+        dolfin.File(images_folder+"/"+working_basename+"-meshcoarse.xml") << mesh
+        mesh=dolfin.refine(mesh)
+        dolfin.File(images_folder+"/"+working_basename+"-meshrefined.xml") << mesh
+
         dmech.run_RivlinCube_Hyperelasticity(
             dim                                    = images_n_dim                      ,
             cube_params                            = cube_params                       ,
@@ -67,7 +69,6 @@ def generate_images_and_meshes_from_RivlinCube(
             step_params                            = step_params                       ,
             const_params                           = const_params                      ,
             load_params                            = load_params                       ,
-            mesh_modifs_params=mesh_modifs_params,
             res_basename                           = images_folder+"/"+working_basename,
             write_vtus_with_preserved_connectivity = True                              ,
             verbose                                = 1                                 )
