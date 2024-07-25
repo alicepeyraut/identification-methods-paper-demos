@@ -14,14 +14,14 @@ import dolfin_warp        as dwarp
 
 def generate_images_and_meshes_from_RivlinCube(
         images_folder    : str   = "generate_images",
-        images_n_dim     : int   = 2                ,
-        images_n_voxels  : int   = 100              ,
-        mesh_size        : float = None             ,
-        deformation_type : str   = "compx"          ,
-        texture_type     : str   = "tagging"        ,
-        noise_level      : float = 0                ,
-        k_run            : int   = None             ,
-        run_model        : bool  = True             ,
+        images_n_dim     : int   = 2,
+        images_n_voxels  : int   = 100,
+        mesh_size        : float = None,
+        deformation_type : str   = "compx",
+        texture_type     : str   = "tagging",
+        noise_level      : float = 0,
+        k_run            : int   = None,
+        run_model        : bool  = True,
         generate_images  : bool  = True             ):
 
     if not os.path.exists(images_folder):
@@ -63,20 +63,20 @@ def generate_images_and_meshes_from_RivlinCube(
         dolfin.File(images_folder+"/"+working_basename+"-meshrefined.xml") << mesh
 
         dmech.run_RivlinCube_Hyperelasticity(
-            dim                                    = images_n_dim                      ,
-            cube_params                            = cube_params                       ,
-            mat_params                             = mat_params                        ,
-            step_params                            = step_params                       ,
-            const_params                           = const_params                      ,
-            load_params                            = load_params                       ,
+            dim                                    = images_n_dim,
+            cube_params                            = cube_params,
+            mat_params                             = mat_params,
+            step_params                            = step_params,
+            const_params                           = const_params,
+            load_params                            = load_params,
             res_basename                           = images_folder+"/"+working_basename,
-            write_vtus_with_preserved_connectivity = True                              ,
+            write_vtus_with_preserved_connectivity = True,
             verbose                                = 1                                 )
 
     if (generate_images):
         ref_image = myvtk.createImageFromSizeAndRes(
-            dim  = images_n_dim   ,
-            size = images_L       ,
+            dim  = images_n_dim,
+            size = images_L,
             res  = images_n_voxels)
 
         if (texture_type == "tagging"):
@@ -90,16 +90,16 @@ def generate_images_and_meshes_from_RivlinCube(
             noise_params = {"type":"normal", "stdev":noise_level}
 
         dwarp.compute_warped_images(
-            working_folder                  = images_folder                                                                            ,
-            working_basename                = working_basename                                                                         ,
-            working_ext                     = "vtu"                                                                                    ,
-            working_displacement_field_name = "U"                                                                                      ,
-            ref_image                       = ref_image                                                                                ,
-            ref_frame                       = 0                                                                                        ,
-            ref_image_model                 = ref_image_model                                                                          ,
-            noise_params                    = noise_params                                                                             ,
+            working_folder                  = images_folder           ,
+            working_basename                = working_basename        ,
+            working_ext                     = "vtu"                   ,
+            working_displacement_field_name = "U"                     ,
+            ref_image                       = ref_image               ,
+            ref_frame                       = 0                       ,
+            ref_image_model                 = ref_image_model         ,
+            noise_params                    = noise_params            ,
             suffix                          = texture_type+"-noise="+str(noise_level)+(k_run is not None)*("-run="+str(k_run).zfill(2)),
-            print_warped_mesh               = 0                                                                                        ,
+            print_warped_mesh               = 0                       ,
             verbose                         = 0                                                                                        )
 
 ########################################################################
