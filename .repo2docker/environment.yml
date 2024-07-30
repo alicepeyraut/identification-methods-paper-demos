@@ -12,22 +12,19 @@ dependencies:
   - scipy=1.10
 
 # jupyter
-  - ipywidgets=7.7
+  - ipywidgets=8.0.1
   - itkwidgets=0.32.6
   - jupyter=1.0
   - jupyter_contrib_nbextensions=0.7
   - jupyter_nbextensions_configurator=0.6
   - jupyterlab=3.6
-  - notebook=6.4
-
-# coding stuff
-  - git=2.39
+  - notebook=6.4.12
 
 # computing stuff
   - fenics=2019.1.0
   - gmsh=4.11
   - meshio=5.3
-  - vtk=9.1
+  - vtk=9.0.3
 
 # plotting stuff
   - matplotlib=3.7
@@ -39,10 +36,7 @@ dependencies:
     - gmsh==4.11
     - meshio==5.3
 
-  # tracking stuff
+  # mechanics stuff
     - dolfin_mech==2024.7.24
     - dolfin_warp==2024.7.25
     - dolfin_estim==2024.7.25.post2
-
-variables:
-    CPATH: /srv/conda/envs/notebook/include/vtk-9.1
