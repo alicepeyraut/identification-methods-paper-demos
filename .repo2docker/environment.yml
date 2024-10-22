@@ -24,7 +24,7 @@ dependencies:
   - fenics=2019.1.0
   - gmsh=4.11
   - meshio=5.3
-  - vtk=9.0
+  - vtk=9.2
 
 # plotting stuff
   - matplotlib=3.7
@@ -43,6 +43,6 @@ dependencies:
     
 
 variables:
-  - CPATH: /srv/conda/envs/notebook/include/vtk-9.0
+  - CPATH: /srv/conda/envs/notebook/include/vtk-9.2
   - expart=2.5
   
