@@ -2,6 +2,6 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14497058.svg)](https://doi.org/10.5281/zenodo.14497058)
 
-Interactive demos can be found at [https://alicepeyraut.github.io/identification-methods-paper-demos-github](https://alicepeyraut.github.io/identification-methods-paper-demos-github).
+Interactive demos can be found at [https://alicepeyraut.github.io/identification-methods-paper-demos](https://alicepeyraut.github.io/identification-methods-paper-demos).
 
 (Main library can be found at [https://github.com/mgenet/dolfin_warp](https://github.com/mgenet/dolfin_warp).)
